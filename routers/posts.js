@@ -11,12 +11,12 @@ router.get('/:id', (req, res) => {
     res.send(`Dettaglio del post ${req.params.id}`);
 })
 
-// CREAT-store
+// CREATE-store
 router.post('/', (req, res) => {
     res.send('Creazione nuovo post');
 })
 
-// UPDATE
+// UPDATE-update
 router.put('/:id', (req, res) => {
     res.send(`Modifica integrale del post ${req.params.id}`);
 })
@@ -30,3 +30,5 @@ router.patch('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
     res.send(`Cancellazione del post ${req.params.id}`);
 })
+
+module.exports = router;
