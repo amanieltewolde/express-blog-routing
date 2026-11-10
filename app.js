@@ -5,6 +5,7 @@ const port = 3000;
 // import del router 'posts'
 const postsRouter = require('./routers/posts');
 const errorsHandler = require('./middlewares/errorsHandler');
+const notFound = require('./middlewares/notFound.js');
 
 // const example = require('./middlewares/example');
 
@@ -19,7 +20,8 @@ app.get('/', (req, res) => {
 
 app.use('/posts', postsRouter);
 
-app.use(errorsHandler)
+app.use(errorsHandler);
+app.use(notFound);
 
 app.listen(port, () => {
     console.log(`App listening on port: ${port}`);
