@@ -6,7 +6,17 @@ const connection = require('../data/db');
 
 // READ-index
 router.get('/', (req, res) => {
-    res.send('Lista dei post');
+    // res.send('Lista dei post');
+    const sql = 'SELECT * FROM posts';
+
+    connection.query(sql, (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                error: 'Somenthing is wrong with the db query'
+            })
+        }
+        res.json(result);
+    })
 })
 
 // READ-show
