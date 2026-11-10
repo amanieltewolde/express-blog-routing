@@ -41,7 +41,19 @@ router.patch('/:id', (req, res) => {
 
 // DELETE-destroy
 router.delete('/:id', (req, res) => {
-    res.send(`Cancellazione del post ${req.params.id}`);
+    // res.send(`Cancellazione del post ${req.params.id}`);
+    const id = req.params.id;
+
+    // Prepared statements
+    const sql = 'DELETE FROM posts WHERE id = ?';
+
+    connection.query(sql, [id], (err) => {
+        if (err) return res.status(500).json({
+            error: 'Somenthing is wrong with the db query'
+        })
+        res.sendStatus(204);
+
+    })
 })
 
 module.exports = router;
