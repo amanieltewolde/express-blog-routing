@@ -5,26 +5,19 @@ const connection = require('../data/db');
 // Base URL /posts
 
 // READ-index
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
     // res.send('Lista dei post');
     const sql = 'SELECT * FROM posts';
 
     connection.query(sql, (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                error: 'Somenthing is wrong with the db query'
-            })
-        }
+        if (err) return next(err);
         res.json(result);
     })
 })
 
 // READ-show
-router.get('/:id', (req, res) => {
-    // res.send(`Dettaglio del post ${req.params.id}`);
+router.get('/:id', (req, res, next) => {
     const id = req.params.id;
-
-    // const sql = `SELECT * FROM posts WHERE id = ${id}`;
 
     // Prepared statements
     const postSql = 'SELECT * FROM posts WHERE id = ?';
@@ -32,24 +25,18 @@ router.get('/:id', (req, res) => {
     const tagSql = 'SELECT tags.label FROM tags JOIN post_tag ON tags.id = tag_id JOIN posts ON post_id = posts.id WHERE post_tag.post_id = ?'
 
     connection.query(postSql, [id], (err, postResult) => {
-        if (err) return res.status(500).json({
-            error: 'Somenthing is wrong with the db query'
-        })
+        if (err) return next(err);
         if (postResult.length === 0) return res.status(404).json({
             error: 'Post not found'
         })
         const post = postResult[0];
 
         connection.query(tagSql, [id], (err, tagResult) => {
-            if (err) return res.status(500).json({
-                error: 'Somenthing is  wrong with the db query'
-            })
-
+            if (err) return next(err);
             post.tag = tagResult;
             res.json(post);
         })
     })
-
 })
 
 // CREATE-store
@@ -68,24 +55,18 @@ router.patch('/:id', (req, res) => {
 })
 
 // DELETE-destroy
-router.delete('/:id', (req, res) => {
-    // res.send(`Cancellazione del post ${req.params.id}`);
+router.delete('/:id', (req, res, next) => {
     const id = req.params.id;
 
     // Prepared statements
     const sql = 'DELETE FROM posts WHERE id = ?';
 
     connection.query(sql, [id], (err, postResult) => {
-        if (err) return res.status(500).json({
-            error: 'Somenthing is wrong with the db query'
-        })
+        if (err) return next(err);
         if (postResult.affectedRows === 0) return res.status(404).json({
             error: 'Post not found'
         })
-        console.log(postResult);
-
         res.sendStatus(204);
-
     })
 })
 
