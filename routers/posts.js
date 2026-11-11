@@ -24,19 +24,32 @@ router.get('/:id', (req, res) => {
     // res.send(`Dettaglio del post ${req.params.id}`);
     const id = req.params.id;
 
-    // Prepared statements
-    const sql = 'SELECT * FROM posts WHERE id = ?';
+    // const sql = `SELECT * FROM posts WHERE id = ${id}`;
 
-    connection.query(sql, [id], (err, result) => {
+    // Prepared statements
+    const postSql = 'SELECT * FROM posts WHERE id = ?';
+
+    const tagSql = 'SELECT tags.label FROM tags JOIN post_tag ON tags.id = tag_id JOIN posts ON post_id = posts.id WHERE post_tag.post_id = ?'
+
+    connection.query(postSql, [id], (err, postResult) => {
         if (err) return res.status(500).json({
             error: 'Somenthing is wrong with the db query'
         })
-        if (result.length === 0) return res.status(404).json({
+        if (postResult.length === 0) return res.status(404).json({
             error: 'Post not found'
         })
-        res.json(result[0]);
+        const post = postResult[0];
 
+        connection.query(tagSql, [id], (err, tagResult) => {
+            if (err) return res.status(500).json({
+                error: 'Somenthing is  wrong with the db query'
+            })
+
+            post.tag = tagResult;
+            res.json(post);
+        })
     })
+
 })
 
 // CREATE-store
@@ -62,10 +75,15 @@ router.delete('/:id', (req, res) => {
     // Prepared statements
     const sql = 'DELETE FROM posts WHERE id = ?';
 
-    connection.query(sql, [id], (err) => {
+    connection.query(sql, [id], (err, postResult) => {
         if (err) return res.status(500).json({
             error: 'Somenthing is wrong with the db query'
         })
+        if (postResult.affectedRows === 0) return res.status(404).json({
+            error: 'Post not found'
+        })
+        console.log(postResult);
+
         res.sendStatus(204);
 
     })
